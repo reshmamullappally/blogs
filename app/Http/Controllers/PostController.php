@@ -22,7 +22,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
     /**
@@ -30,7 +30,18 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validateData=$request->validate([
+            'title'=>'required|string|max:255',
+            'content'=>'required|string|max:255',
+            'post_image'=>'required|mimes:jpg,png'
+        ]);
+        $post=new Post();
+        $post->user_id=Auth::user()->id;
+        $post->title=$request->title;
+        $post->content=$request->content;
+        $post->post_image=$request->file('post_image')->store('post_images','public');
+        $post->save();
+        return redirect('/posts');
     }
 
     /**
@@ -62,6 +73,8 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $post=Post::find($id);
+        $post->delete();
+        return response()->json(['status'=>"success","message"=>"Deleted"]);
     }
 }
